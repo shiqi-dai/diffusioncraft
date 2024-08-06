@@ -1,0 +1,89 @@
+lr: 0.0005
+diffusion_steps: 1000 
+image_size: 256
+noise_schedule: linear 
+num_channels: 32 
+num_head_channels: 16 
+channel_mult: "1,1" 
+attention_resolutions: "2" 
+num_res_blocks: 1 
+resblock_updown: True 
+use_fp16: True 
+use_scale_shift_norm: True 
+use_checkpoint: True 
+batch_size: 8
+lr_anneal_steps: 50000 
+save_interval: 2000 
+predict_previousx: False 
+predict_xstart:: True 
+crop: 0.8
+wandb_dir: "WANDB" # dir of wandb
+
+# from worldgan.config.py
+sub_coord_dict:
+  ruins: [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+  simple_beach: [0.0, 0.5, 0.0, 1.0, 0.0, 1.0]
+  desert: [0.25, 0.75, 0.0, 1.0, 0.25, 0.75]
+  plains: [0.25, 0.75, 0.0, 1.0, 0.25, 0.75]
+  swamp: [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+  vanilla_village_small: [0.33333, 0.66667, 0.0, 1.0, 0.33333, 0.66667]
+  vanilla_village_large: [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+  vanilla_mineshaft: [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+
+# workspace:
+not_cuda: False  # disables cuda
+gpu: 0 # which gpu to use
+netG: ""  # path to netG (to continue training)
+netD: ""  # path to netD (to continue training)
+manualSeed:  None # type: Optional[int]
+
+# use mulitple inputs for training (use --input-names instead of --input-name)
+use_multiple_inputs: False
+input_names: [] # type: List[str], input level names (if multiple inputs are used)
+
+# Minecraft输入和渲染后的输出保存
+input_dir: "./worldgan/minecraft/minecraft_worlds"  # 我的世界地图目录
+input_name: "Drehmal v2.1.1 PRIMORDIAL"  # 我的世界训练地图输入，含多种area    
+input_area_name: "vanilla_mineshaft" # "vanilla_village"  # needs to be a string from the coord dictionary in input folder
+# [ruins1, simple_beach, desert1, plains, swamp1, vanilla_village, vanilla_mineshaft1]
+# input_area_size: "_large"
+# input_area_size: "_small"
+input_area_size: ""
+output_dir: ""  # folder with worlds for rendering
+output_name: ""  # generated world name
+sub_coords: [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]  # type: List[float], defines which coords of the full coord are are 似乎四坐标放缩
+
+# stage hyper parameters:
+nfc: 64  # number of filters per conv layers 有多少个filters决定多少out_channels
+ker_size: 3  # kernel size per conv layers
+num_layer: 3  # number of layers
+scales: [0.75, 0.5, 0.25]  # type: List[float], Scales descending (< 1 and > 0)
+noise_update: 0.1  # additive noise weight
+pad_with_noise: True
+nc_current: 32 # dim of C, full shape is (B,C,W,H,D)
+
+# optimization hyper parameters
+niter: 3000  # number of epochs to train per scale
+gamma: 0.1  # scheduler gamma
+lr_g: 0.0005  # generator learning rate
+lr_d: 0.0005  # discriminator learning rate
+beta1: 0.5  # optimizer beta
+Gsteps: 3  # generator inner steps
+Dsteps: 3  # discriminator inner steps
+lambda_grad: 0.1  # gradient penalty weight
+alpha: 100  # reconstruction loss weight
+
+# WorldGAN贡献
+token_list: ['!', '#', '-', '1', '@', 'C', 'S','U', 'X', 'g', 'k', 't']  # type: List[str], default list of 1-1
+render: False  # if the training examples should be rendered for logging purposes
+repr_type: "block2vec" # Which representation type to use, currently [None, block2vec, autoencoder]
+repr_dim: 8
+repr_fn: "./worldgan/minecraft/block2vec/output/block2vec/"
+
+# config for mcpi raspberryjuice wrapping
+server_train: False  # set to true if you want to train live on a server running RaspberryJuice!
+server_start_pos: [0, 0, 0]  # type: List[int], start coordinates for sample (0,0,0 is spawn, not true!)
+server_end_pos: [10, 10, 10]  # type: List[int], end coordinates for sample (0,0,0 is spawn, not true!)
+server_render_tmp: False # set to true if you want to see a temporary sample rendered at server_render_pos
+server_render_pos: [20, 0, 0]  # type: List[int], position at which results are shown (make sure to not overlap this with your actual target area!)
+server_get_block_data: True  # if False, will try to use getBlocks() which does not seem to work correctly yet
